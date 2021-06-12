@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -41,6 +42,7 @@ public class ListDeviceActivity extends AppCompatActivity {
     private String token;
     private ProgressBar progressBar;
     private RecyclerView listView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +51,12 @@ public class ListDeviceActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progressBar);
         listView = findViewById(R.id.listView);
+        swipeRefreshLayout = findViewById(R.id.srlRefreshLayout);
 
         //check if login
         Amplify.Auth.fetchAuthSession(
             session -> {
-                if (session.isSignedIn() == false) {
+                if (!session.isSignedIn()) {
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
                     finish();
@@ -81,6 +84,13 @@ public class ListDeviceActivity extends AppCompatActivity {
                 },
                 error -> Log.e("AuthSession122", "Error +++++++" + error.getMessage())
         );
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                RequestDeviceList();
+            }
+        });
     }
 
     private void RequestDeviceList() {
@@ -89,6 +99,7 @@ public class ListDeviceActivity extends AppCompatActivity {
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
+                deviceList.clear();
                 for (int i=0; i<response.length(); i++) {
                     try {
                         JSONObject jsonDevice = response.getJSONObject(i);
@@ -102,6 +113,7 @@ public class ListDeviceActivity extends AppCompatActivity {
                 ListViewAdapter adapter = new ListViewAdapter(deviceList);
                 listView.setAdapter(adapter);
                 progressBar.setVisibility(View.INVISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
 
             }
         }, new Response.ErrorListener() {
@@ -158,6 +170,7 @@ public class ListDeviceActivity extends AppCompatActivity {
                     intent.putExtra("SUBCATEGORY", deviceList.get(holder.postion).SubCategory);
                     intent.putExtra("USERID", deviceList.get(holder.postion).UserID);
                     intent.putExtra("RUNTIME", deviceList.get(holder.postion).RunTime);
+                    intent.putExtra("TYPEID", deviceList.get(holder.postion).TypeID);
 
                     startActivity(intent);
                 }

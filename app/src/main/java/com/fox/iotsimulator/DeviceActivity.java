@@ -57,7 +57,7 @@ public class DeviceActivity extends AppCompatActivity {
         //check if login
         Amplify.Auth.fetchAuthSession(
             session -> {
-                if (session.isSignedIn() == false) {
+                if (!session.isSignedIn()) {
                     Intent loginIntent = new Intent(this, MainActivity.class);
                     startActivity(loginIntent);
                     finish();
@@ -65,6 +65,18 @@ public class DeviceActivity extends AppCompatActivity {
             },
             error -> Log.e("AuthSession", "Error +++++++" + error.getMessage())
         );
+
+        //Get the data from the last activity
+        Intent intent = getIntent();
+        String userID = intent.getStringExtra("USERID");
+        String deviceID = intent.getStringExtra("DEVICEID");
+        String category = intent.getStringExtra("CATEGORY");
+        String subCategory = intent.getStringExtra("SUBCATEGORY");
+        String stage = intent.getStringExtra("STAGE");
+        int runTime = intent.getIntExtra("RUNTIME", 0);
+        String typeID = intent.getStringExtra("TYPEID");
+
+        device = new Device(userID, deviceID, stage, runTime, category, subCategory, typeID);
 
         //load token
         Amplify.Auth.fetchAuthSession(
@@ -87,17 +99,7 @@ public class DeviceActivity extends AppCompatActivity {
             error -> Log.e("AuthSession122", "Error +++++++" + error.getMessage())
         );
 
-        //Get the data from the last activity
-        Intent intent = getIntent();
-        String userID = intent.getStringExtra("USERID");
-        String deviceID = intent.getStringExtra("DEVICEID");
-        String category = intent.getStringExtra("CATEGORY");
-        String subCategory = intent.getStringExtra("SUBCATEGORY");
-        String stage = intent.getStringExtra("STAGE");
-        int runTime = intent.getIntExtra("RUNTIME", 0);
-        String typeID = intent.getStringExtra("TYPEID");
 
-        device = new Device(userID, deviceID, stage, runTime, category, subCategory, typeID);
         btnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,7 +127,7 @@ public class DeviceActivity extends AppCompatActivity {
             } else {
                 body.put("operation", "stop");
             }
-            body.put("metadata", new JSONArray());
+            body.put("metadata", new JSONObject());
 
         } catch (JSONException e) {
             e.printStackTrace();
