@@ -1,16 +1,22 @@
 package com.fox.iotsimulator;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -44,6 +50,8 @@ public class ListDeviceActivity extends AppCompatActivity {
     private RecyclerView listView;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private static final String TAG = "ListDeviceActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +60,9 @@ public class ListDeviceActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         listView = findViewById(R.id.listView);
         swipeRefreshLayout = findViewById(R.id.srlRefreshLayout);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("IoT Device List");
 
         //check if login
         Amplify.Auth.fetchAuthSession(
@@ -91,6 +102,85 @@ public class ListDeviceActivity extends AppCompatActivity {
                 RequestDeviceList();
             }
         });
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.action, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add_new_device:
+                // Use the Builder class for convenient dialog construction
+                AlertDialog.Builder builder = new AlertDialog.Builder(ListDeviceActivity.this);
+                builder.setMessage(R.string.dialog_create_new_device)
+                    .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // FIRE ZE MISSILES!
+                            //create a new device
+                            progressBar.setVisibility(View.VISIBLE);
+                            CreateNewDevice();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog - do nothing
+                            dialog.cancel();
+                        }
+                    });
+                // Create the AlertDialog object and return it
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                return true;
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    private void CreateNewDevice(){
+        String url = "https://3zpb6wo7kf.execute-api.ap-southeast-1.amazonaws.com/prod/devices/widgets";
+        JSONObject body = new JSONObject();
+        try {
+            body.put("typeId", "McGfofJ3s");
+            body.put("count", 1);
+            body.put("metadata", new JSONObject());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, body, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                if (response.has("processedItems")) {
+                    //the new device created.
+                    RequestDeviceList();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "Volley Response.ErrorListener: " + error.getMessage());
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", token);
+                return params;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(request);
     }
 
     private void RequestDeviceList() {

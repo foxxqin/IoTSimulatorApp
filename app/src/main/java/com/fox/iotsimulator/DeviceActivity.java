@@ -1,5 +1,6 @@
 package com.fox.iotsimulator;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -42,6 +43,10 @@ public class DeviceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("Device Details");
 
         tvSubCategory = findViewById(R.id.tvSubCategory);
         tvDeviceID = findViewById(R.id.tvDeviceID);
