@@ -1,0 +1,10 @@
+{
+  "auth": {
+    "iotsimulatore2d2df9fe2d2df9f": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
+}

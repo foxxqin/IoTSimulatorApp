@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-iotsimulator-dev-183011-authRole",
+      "UnauthRoleArn": "arn:aws:iam::598621183242:role/amplify-iotsimulator-dev-183011-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::598621183242:role/amplify-iotsimulator-dev-183011-authRole",
+      "Region": "ap-southeast-1",
+      "DeploymentBucketName": "amplify-iotsimulator-dev-183011-deployment",
+      "UnauthRoleName": "amplify-iotsimulator-dev-183011-unauthRole",
+      "StackName": "amplify-iotsimulator-dev-183011",
+      "StackId": "arn:aws:cloudformation:ap-southeast-1:598621183242:stack/amplify-iotsimulator-dev-183011/042e8db0-caa0-11eb-a29b-063c5f980302",
+      "AmplifyAppId": "d2z70bluij3c13"
+    },
+    "categories": {
+      "auth": {
+        "iotsimulatore2d2df9fe2d2df9f": {}
+      }
+    }
+  }
+}
