@@ -42,17 +42,20 @@ public class MainActivity extends AppCompatActivity {
                     Amplify.Auth.signIn(
                             username,
                             password,
-                            result -> Log.i("AuthQuickstart", result.isSignInComplete() ? "Sign in succeeded" : "Sign in not complete"),
+                            result -> {
+                                if (result.isSignInComplete()) {
+                                    Intent intent = new Intent(getApplicationContext(), ListDeviceActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                                },
                             error -> {Log.e("AuthQuickstart", error.toString()); errorMessage = "Email or password is incorrect.";}
                     );
+
                 }
                 if (errorMessage.equals("") == false) {
                     Snackbar warning = Snackbar.make(view, errorMessage, Snackbar.LENGTH_LONG);
                     warning.show();
-                } else {
-                    Intent intent = new Intent(getApplicationContext(), ListDeviceActivity.class);
-                    startActivity(intent);
-                    finish();
                 }
             }
         });

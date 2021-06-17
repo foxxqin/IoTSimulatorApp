@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -45,6 +48,7 @@ public class DeviceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_device);
 
         ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("Device Details");
 
@@ -117,6 +121,12 @@ public class DeviceActivity extends AppCompatActivity {
 
     }
 
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.message, menu);
+        return true;
+    }
+
     private void StartOrStopDevice() {
         String url = "https://3zpb6wo7kf.execute-api.ap-southeast-1.amazonaws.com/prod/devices/widgets/";
         url = url + device.DeviceID;
@@ -187,5 +197,21 @@ public class DeviceActivity extends AppCompatActivity {
         }
 
 //        btnStartStop.setActivated(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+
+                return true;
+            case R.id.connect_mqtt:
+                Intent messageIntent = new Intent(this, MessageActivity.class);
+                startActivity(messageIntent);
+
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
